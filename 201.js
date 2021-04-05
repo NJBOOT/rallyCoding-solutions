@@ -25,12 +25,18 @@ const solve = arr => {
       // reset currentRun to current value since array stopped ascending, currentRun is done
       currentRun = [curr];
     } else {
-      // else it's still asceding, so just push the current value to currentRun
+      // else it's still ascending, so just push the current value to currentRun
       currentRun.push(curr);
     }
   }
-  return maxRun;
+  // currentRun will be longer than maxRun if the longest increasing sequence includes the last value
+  return maxRun.length > currentRun.length ? maxRun : currentRun;
 };
+
+console.log(solve([-10, -7, -5, -20, 21, 20, 9]));
+console.log(solve([10, 7, 5, 20, 21, 23, 9]));
+console.log(solve([-10, -7, -5, -20, -40, 30, 20, 9, 100, 101, 102, 104, 108]));
+console.log(solve([20, 21, 5, 3, 4, 7, 1, 24]));
 
 // FIRST ATTEMPT
 const solveRough = arr => {
@@ -40,7 +46,6 @@ const solveRough = arr => {
     arrays.push(subArr);
     arr = arr.slice(subArr.length);
   }
-  console.log(arrays);
   let maxArrayLength = Math.max(...arrays.map(el => el.length));
   let maxArray = arrays.filter(array => array.length === maxArrayLength).pop();
 
@@ -72,7 +77,64 @@ const helper = intArray => {
 // min max algo in array. go through list of items and keep track for best candidate. let me replace current best guess
 //
 
-console.log(solve([-10, -7, -5, -20, 21, 20, 9]));
-console.log(solve([10, 7, 5, 20, 21, 23, 9]));
-console.log(solve([-10, -7, -5, -20, -40, 30, 20, 9]));
-console.log(solve([20, 21, 5, 3, 4, 5, 1, 24]));
+// console.log(solve([-10, -7, -5, -20, 21, 20, 9]));
+// console.log(solve([10, 7, 5, 20, 21, 23, 9]));
+// console.log(solve([-10, -7, -5, -20, -40, 30, 20, 9, 100, 101, 102, 104, 108]));
+// console.log(solve([20, 21, 5, 3, 4, 7, 1, 24]));
+
+// better solutions
+
+function longestIncreasingSequence(sequence) {
+  let longest = [];
+  let current = [];
+
+  for (let i = 0; i < sequence.length; i++) {
+    const previousValue = sequence[i - 1] || -Infinity;
+    const value = sequence[i];
+
+    if (value < previousValue) {
+      if (current.length > longest.length) longest = current;
+      current = [value];
+    } else {
+      current.push(value);
+    }
+  }
+
+  return current.length > longest.length ? current : longest;
+}
+
+// console.log(
+//   longestIncreasingSequence([
+//     -10,
+//     -7,
+//     -5,
+//     -20,
+//     -40,
+//     30,
+//     20,
+//     9,
+//     100,
+//     101,
+//     102,
+//     104,
+//     108,
+//   ])
+// );
+
+const solvebest = intArray => {
+  let best = [];
+
+  while (intArray.length > 0) {
+    let curr = [];
+    while (curr.length == 0 || intArray[0] > curr[curr.length - 1]) {
+      curr.push(intArray.shift());
+    }
+    if (curr.length > best.length) {
+      best = curr;
+    }
+  }
+  return best;
+};
+// grab current 'run' of qualifying values
+// see if its the best
+// repeat till out of values
